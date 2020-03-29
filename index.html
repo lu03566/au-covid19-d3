@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8">
+ 
+  <head>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
+
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js" integrity="sha384-6khuMg9gaYr5AxOqhkVIODVIvm9ynTT5J4V1cfthmT+emCG6yVmEZsRHdxlotUnm" crossorigin="anonymous"></script>
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/1.6.19/topojson.min.js"></script>
+  <style>
+	
+	.floatR  {
+		float: right;
+	}
+  </style>
+  
+  </head>
+  <body>
+
+<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+  <h5 class="my-0 mr-md-auto font-weight-normal">Chen Lu @ lu.03566@gmail.com</h5>
+ </div>
+
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+  <h1 class="display-4">Information about COVID-19</h1>
+  <p class="lead">Coronavirus in <b>Australia</b>‎</p></div>
+
+<div class="container" style="display: flex;align-items: center;">
+
+    <div class="card mb-4 shadow-sm text-center" style="width:30%">
+      <div class="card-header">
+        <h4 class="my-0 font-weight-normal stateSelected">
+			<div style="display:inline"> <img src="https://www.worldometers.info/img/flags/small/tn_as-flag.gif" width="60" border="1 px solid #aaa"></div>
+			Australia
+		</h4>
+		<small id="state-name" class="text-muted"></small>
+      </div>
+      <div class="card-body">
+        <h5 class="card-title pricing-card-title">Coronavirus Cases:</h5>
+		<h5 class="card-title pricing-card-title" id="totalCases">3,635</h5>
+
+        <h5 class="card-title pricing-card-title" id="deathCasesHeader">Death:</h5>
+		<h5 class="card-title pricing-card-title" id="deathCases">14</h5>
+
+        <h5 class="card-title pricing-card-title" id="recoverCasesHeader">Recovered:</h5>
+        <h5 class="card-title pricing-card-title" id="recoverCases">170</h5>
+
+      </div>
+    </div>
+	
+	<div class="floatR" style="width:25%;height:628px;">     
+    </div>
+ </div>
+	
+	
+<script>
+	function onMouseOver(name) {
+		//document.getElementById('country-name').firstChild.data = name;
+		var elems = document.getElementsByClassName(name);
+		//elems[0].style.fill = "red";
+		elems[0].style.stroke = "red";
+		elems[0].style.strokeWidth = 2
+		
+		document.getElementById('state-name').innerHTML = name;
+		document.getElementById('deathCases').style.display = "none"
+		document.getElementById('recoverCases').style.display = "none"
+		document.getElementById('deathCasesHeader').style.display = "none"
+		document.getElementById('recoverCasesHeader').style.display = "none"
+		
+		switch(name) {
+		  case "Western Australia":
+			document.getElementById('totalCases').innerHTML = "278";
+
+			break;
+		  case "Northern Territory":
+			// code block
+			document.getElementById('totalCases').innerHTML = "14";
+
+			break;
+		  case "South Australia":
+			// code block
+			document.getElementById('totalCases').innerHTML = "287";
+			break;
+		  case "Queensland":
+			// code block
+			document.getElementById('totalCases').innerHTML = "625";
+			break;
+		  case "Victoria":
+			// code block
+			document.getElementById('totalCases').innerHTML = "685";
+			break;
+		  case "Canberra":
+			// code block
+			document.getElementById('totalCases').innerHTML = "71";
+			break;
+		  case "New South Wales":
+			// code block
+			document.getElementById('totalCases').innerHTML = "1,617";
+			break;
+		  default:
+			document.getElementById('totalCases').innerHTML = "58";
+		}
+		
+		
+		}
+		
+	function onMouseLeft(name) {
+		var elems = document.getElementsByClassName(name);
+		//elems[0].style.fill = "#222";
+	    elems[0].style.strokeWidth = 0;
+		document.getElementById('state-name').innerHTML = "";
+		document.getElementById('totalCases').innerHTML = "3,635";
+		document.getElementById('deathCases').style.display = "block"
+		document.getElementById('recoverCases').style.display = "block"
+		document.getElementById('deathCasesHeader').style.display = "block"
+		document.getElementById('recoverCasesHeader').style.display = "block"
+		}
+	
+      var width = 760,
+          height = 628;
+    
+      var projection = d3.geo.conicConformal()
+        .rotate([-144, 0])
+        .center([0, -27])
+        .parallels([0, 0])
+        .scale(700)
+   
+
+      var path = d3.geo.path()
+        .projection(projection);
+      
+      var svg = d3.select(".floatR").append("svg")
+          .attr("width", width)
+          .attr("height", height);
+		  
+      
+	  var count = 0;
+
+      d3.json("australia.json", function(error, australia) {
+        if (error) throw error;
+		
+		//ctrl + q
+        svg.append("g")
+            .attr("class", "states")
+          .selectAll("path")
+            .data(topojson.feature(australia, australia.objects.states).features)
+          .enter().append("path")
+            .attr("d", path)
+			.attr("class", function(d) { 
+								console.log(d.properties.woe_name);
+								return d.properties.woe_name; 
+							}
+				)
+			.attr("onmouseover", function(d) { 
+								console.log(d.properties.woe_name);
+								var event = "onMouseOver('" + d.properties.woe_name + "')";
+								return event; 
+							} 
+			
+				)
+			.attr("onmouseout", function(d) { 
+								console.log(d.properties.woe_name);
+								var event = "onMouseLeft('" + d.properties.woe_name + "')";
+								return event; 
+							} 
+			
+				);
+			  //.style("stroke", 'blue')
+			  //.style("stroke-width", 2);
+				
+		
+      });
+      
+      d3.select(self.frameElement).style("height", height + "px");
+      
+    </script>
+  
+  </body>
+</html>
